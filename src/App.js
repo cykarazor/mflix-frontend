@@ -14,12 +14,15 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  InputAdornment,
+  IconButton,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import ClearIcon from '@mui/icons-material/Clear';  // <-- added clear icon
 
 import EditMovieForm from './EditMovieForm'; // Your form component
 
@@ -39,7 +42,6 @@ function App() {
   const [sort, setSort] = useState('title');
   const [editMovieId, setEditMovieId] = useState(null);
 
-  // New states for movie details modal
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsError, setDetailsError] = useState(null);
@@ -71,7 +73,6 @@ function App() {
       });
   }, [page, sort, search]);
 
-  // Fetch single movie details for modal
   const openDetailsModal = async (movieId) => {
     setDetailsLoading(true);
     setDetailsError(null);
@@ -102,6 +103,12 @@ function App() {
     setPage(1);
   };
 
+  // Clear search handler
+  const handleClearSearch = () => {
+    setSearch('');
+    setPage(1);
+  };
+
   return (
     <Container maxWidth="md" sx={{ mt: 5, mb: 6 }}>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center' }}>
@@ -123,6 +130,22 @@ function App() {
           }}
           fullWidth
           sx={{ maxWidth: 400 }}
+          InputProps={{
+            endAdornment: (
+              search && (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="clear search"
+                    onClick={handleClearSearch}
+                    edge="end"
+                    size="small"
+                  >
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              )
+            ),
+          }}
         />
 
         <TextField
@@ -170,7 +193,7 @@ function App() {
                   variant="outlined"
                   startIcon={<EditIcon sx={{ mr: 0.5 }} />}
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering list item click
+                    e.stopPropagation(); // prevent opening details modal
                     setEditMovieId(movie._id);
                   }}
                   sx={{ textTransform: 'none' }}
