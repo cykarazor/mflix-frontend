@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 
-// Added pagination icons
+// Pagination icons
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
@@ -142,7 +142,7 @@ function App() {
               secondaryAction={
                 <Button
                   variant="outlined"
-                  startIcon={<EditIcon />}
+                  startIcon={<EditIcon sx={{ mr: 0.5 }} />}
                   onClick={() => setEditMovieId(movie._id)}
                   sx={{ textTransform: 'none' }}
                 >
@@ -167,7 +167,7 @@ function App() {
             onClick={() => setPage(1)}
             disabled={page === 1}
             sx={{ minWidth: 80 }}
-            startIcon={<FirstPageIcon />}
+            startIcon={<FirstPageIcon sx={{ mr: 0.5 }} />}
           >
             First
           </Button>
@@ -176,7 +176,7 @@ function App() {
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}
             sx={{ minWidth: 80 }}
-            startIcon={<NavigateBeforeIcon />}
+            startIcon={<NavigateBeforeIcon sx={{ mr: 0.5 }} />}
           >
             Prev
           </Button>
@@ -188,7 +188,7 @@ function App() {
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={page === totalPages}
             sx={{ minWidth: 80 }}
-            endIcon={<NavigateNextIcon />}
+            endIcon={<NavigateNextIcon sx={{ ml: 0.5 }} />}
           >
             Next
           </Button>
@@ -197,7 +197,7 @@ function App() {
             onClick={() => setPage(totalPages)}
             disabled={page === totalPages}
             sx={{ minWidth: 80 }}
-            endIcon={<LastPageIcon />}
+            endIcon={<LastPageIcon sx={{ ml: 0.5 }} />}
           >
             Last
           </Button>
