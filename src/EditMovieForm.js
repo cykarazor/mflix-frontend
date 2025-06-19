@@ -87,22 +87,13 @@ function EditMovieForm({ movieId, onClose, onUpdated }) {
 
   return (
     <Box sx={{ position: 'relative' }}>
-      {/* Top bar with X icon */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 8,
-          right: 8,
-        }}
-      >
-        <IconButton onClick={onClose} size="small">
+      {/* Header with title and close icon */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h6">Edit Movie</Typography>
+        <IconButton onClick={onClose}>
           <CloseIcon />
         </IconButton>
       </Box>
-
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        Edit Movie
-      </Typography>
 
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
@@ -128,6 +119,9 @@ function EditMovieForm({ movieId, onClose, onUpdated }) {
           />
 
           <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Button onClick={onClose} disabled={saving}>
+              Cancel
+            </Button>
             <Button
               type="submit"
               variant="contained"
