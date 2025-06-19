@@ -6,15 +6,23 @@ import {
   Stack,
   CircularProgress,
   Alert,
-  IconButton,
-  Box,
-  Typography,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 
 function EditMovieForm({ movieId, onClose, onUpdated }) {
-  const [title, setTitle] = useState('');
-  const [year, setYear] = useState('');
+  const [form, setForm] = useState({
+    title: '',
+    year: '',
+    plot: '',
+    fullplot: '',
+    genres: '',
+    cast: '',
+    languages: '',
+    directors: '',
+    rated: '',
+    poster: '',
+    runtime: '',
+    countries: ''
+  });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -32,8 +40,20 @@ function EditMovieForm({ movieId, onClose, onUpdated }) {
         return res.json();
       })
       .then(data => {
-        setTitle(data.title || '');
-        setYear(data.year ? data.year.toString() : '');
+        setForm({
+          title: data.title || '',
+          year: data.year?.toString() || '',
+          plot: data.plot || '',
+          fullplot: data.fullplot || '',
+          genres: data.genres?.join(', ') || '',
+          cast: data.cast?.join(', ') || '',
+          languages: data.languages?.join(', ') || '',
+          directors: data.directors?.join(', ') || '',
+          rated: data.rated || '',
+          poster: data.poster || '',
+          runtime: data.runtime?.toString() || '',
+          countries: data.countries?.join(', ') || ''
+        });
         setLoading(false);
       })
       .catch(err => {
@@ -42,18 +62,23 @@ function EditMovieForm({ movieId, onClose, onUpdated }) {
       });
   }, [movieId]);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     setError(null);
     setSuccessMsg(null);
 
-    if (!title.trim()) {
+    if (!form.title.trim()) {
       setError('Title is required');
       setSaving(false);
       return;
     }
-    if (year && !/^\d{4}$/.test(year)) {
+    if (form.year && !/^[0-9]{4}$/.test(form.year)) {
       setError('Year must be a 4-digit number');
       setSaving(false);
       return;
@@ -64,9 +89,19 @@ function EditMovieForm({ movieId, onClose, onUpdated }) {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: title.trim(),
-          year: year ? parseInt(year, 10) : null,
-        }),
+          title: form.title.trim(),
+          year: form.year ? parseInt(form.year, 10) : null,
+          plot: form.plot.trim(),
+          fullplot: form.fullplot.trim(),
+          genres: form.genres.split(',').map(g => g.trim()).filter(Boolean),
+          cast: form.cast.split(',').map(c => c.trim()).filter(Boolean),
+          languages: form.languages.split(',').map(l => l.trim()).filter(Boolean),
+          directors: form.directors.split(',').map(d => d.trim()).filter(Boolean),
+          rated: form.rated.trim(),
+          poster: form.poster.trim(),
+          runtime: form.runtime ? parseInt(form.runtime, 10) : null,
+          countries: form.countries.split(',').map(c => c.trim()).filter(Boolean)
+        })
       });
 
       if (!response.ok) {
@@ -86,53 +121,32 @@ function EditMovieForm({ movieId, onClose, onUpdated }) {
   if (loading) return <CircularProgress />;
 
   return (
-    <Box sx={{ position: 'relative' }}>
-      {/* Header with title and close icon */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h6">Edit Movie</Typography>
-        <IconButton onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      </Box>
+    <form onSubmit={handleSubmit}>
+      <Stack spacing={2}>
+        {error && <Alert severity="error">{error}</Alert>}
+        {successMsg && <Alert severity="success">{successMsg}</Alert>}
 
-      <form onSubmit={handleSubmit}>
-        <Stack spacing={2}>
-          {error && <Alert severity="error">{error}</Alert>}
-          {successMsg && <Alert severity="success">{successMsg}</Alert>}
+        <TextField label="Title" name="title" value={form.title} onChange={handleChange} fullWidth required autoFocus />
+        <TextField label="Year" name="year" value={form.year} onChange={handleChange} fullWidth inputProps={{ maxLength: 4 }} />
+        <TextField label="Plot" name="plot" value={form.plot} onChange={handleChange} fullWidth multiline rows={2} />
+        <TextField label="Full Plot" name="fullplot" value={form.fullplot} onChange={handleChange} fullWidth multiline rows={3} />
+        <TextField label="Genres (comma-separated)" name="genres" value={form.genres} onChange={handleChange} fullWidth />
+        <TextField label="Cast (comma-separated)" name="cast" value={form.cast} onChange={handleChange} fullWidth />
+        <TextField label="Languages (comma-separated)" name="languages" value={form.languages} onChange={handleChange} fullWidth />
+        <TextField label="Directors (comma-separated)" name="directors" value={form.directors} onChange={handleChange} fullWidth />
+        <TextField label="Rated" name="rated" value={form.rated} onChange={handleChange} fullWidth />
+        <TextField label="Poster URL" name="poster" value={form.poster} onChange={handleChange} fullWidth />
+        <TextField label="Runtime (minutes)" name="runtime" value={form.runtime} onChange={handleChange} fullWidth />
+        <TextField label="Countries (comma-separated)" name="countries" value={form.countries} onChange={handleChange} fullWidth />
 
-          <TextField
-            label="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            fullWidth
-            required
-            autoFocus
-          />
-
-          <TextField
-            label="Year"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            fullWidth
-            inputProps={{ maxLength: 4 }}
-            placeholder="e.g. 2022"
-          />
-
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
-            <Button onClick={onClose} disabled={saving}>
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={saving}
-            >
-              {saving ? <CircularProgress size={24} /> : 'Save'}
-            </Button>
-          </Stack>
+        <Stack direction="row" spacing={2} justifyContent="flex-end">
+          <Button onClick={onClose} disabled={saving}>Cancel</Button>
+          <Button type="submit" variant="contained" disabled={saving}>
+            {saving ? <CircularProgress size={24} /> : 'Save'}
+          </Button>
         </Stack>
-      </form>
-    </Box>
+      </Stack>
+    </form>
   );
 }
 
