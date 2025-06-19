@@ -100,17 +100,37 @@ function App() {
         spacing={2}
         sx={{ mb: 4, justifyContent: 'space-between' }}
       >
-        <TextField
-          label="Search"
-          variant="outlined"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
-          fullWidth
-          sx={{ maxWidth: 400 }}
-        />
+        import ClearIcon from '@mui/icons-material/Clear';  // <-- import this at the top
+
+// ...
+
+<TextField
+  label="Search"
+  variant="outlined"
+  value={search}
+  onChange={(e) => {
+    setSearch(e.target.value);
+    setPage(1);
+  }}
+  fullWidth
+  sx={{ maxWidth: 400 }}
+  InputProps={{
+    endAdornment: search ? (
+      <IconButton
+        aria-label="clear search"
+        onClick={() => {
+          setSearch('');
+          setPage(1);
+        }}
+        edge="end"
+        size="small"
+      >
+        <ClearIcon />
+      </IconButton>
+    ) : null,
+  }}
+/>
+
 
         <TextField
           select
