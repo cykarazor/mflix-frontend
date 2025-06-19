@@ -14,19 +14,12 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  InputAdornment,
-  IconButton,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-
-// Pagination icons
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-
-// Clear search icon
-import ClearIcon from '@mui/icons-material/Clear';
 
 import EditMovieForm from './EditMovieForm'; // Your form component
 
@@ -45,6 +38,11 @@ function App() {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('title');
   const [editMovieId, setEditMovieId] = useState(null);
+
+  // New states for movie details modal
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+  const [detailsError, setDetailsError] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -73,16 +71,34 @@ function App() {
       });
   }, [page, sort, search]);
 
+  // Fetch single movie details for modal
+  const openDetailsModal = async (movieId) => {
+    setDetailsLoading(true);
+    setDetailsError(null);
+    setSelectedMovie(null);
+
+    try {
+      const res = await fetch(`https://mflix-backend-ysnw.onrender.com/api/movies/${movieId}`);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const data = await res.json();
+      setSelectedMovie(data);
+    } catch (error) {
+      setDetailsError('Failed to load movie details');
+    } finally {
+      setDetailsLoading(false);
+    }
+  };
+
+  const handleCloseDetailsModal = () => {
+    setSelectedMovie(null);
+    setDetailsError(null);
+  };
+
   const handleCloseEditModal = () => {
     setEditMovieId(null);
   };
 
   const handleMovieUpdated = () => {
-    setPage(1);
-  };
-
-  const clearSearch = () => {
-    setSearch('');
     setPage(1);
   };
 
@@ -107,20 +123,6 @@ function App() {
           }}
           fullWidth
           sx={{ maxWidth: 400 }}
-          InputProps={{
-            endAdornment: search && (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="clear search"
-                  onClick={clearSearch}
-                  edge="end"
-                  size="small"
-                >
-                  <ClearIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
         />
 
         <TextField
@@ -167,7 +169,10 @@ function App() {
                 <Button
                   variant="outlined"
                   startIcon={<EditIcon sx={{ mr: 0.5 }} />}
-                  onClick={() => setEditMovieId(movie._id)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent triggering list item click
+                    setEditMovieId(movie._id);
+                  }}
                   sx={{ textTransform: 'none' }}
                 >
                   Edit
@@ -176,7 +181,9 @@ function App() {
               sx={{
                 px: 3,
                 bgcolor: index % 2 === 0 ? 'action.hover' : 'background.default',
+                cursor: 'pointer',
               }}
+              onClick={() => openDetailsModal(movie._id)}
             >
               <ListItemText
                 primary={<Typography sx={{ fontWeight: 'medium' }}>{movie.title}</Typography>}
@@ -231,6 +238,7 @@ function App() {
         </Stack>
       )}
 
+      {/* Edit Movie Modal */}
       <Dialog open={!!editMovieId} onClose={handleCloseEditModal} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Movie Details</DialogTitle>
         <DialogContent dividers>
@@ -247,6 +255,40 @@ function App() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEditModal}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Movie Details Modal */}
+      <Dialog
+        open={!!selectedMovie || detailsLoading || !!detailsError}
+        onClose={handleCloseDetailsModal}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Movie Details</DialogTitle>
+        <DialogContent dividers>
+          {detailsLoading && (
+            <Stack alignItems="center" sx={{ my: 4 }}>
+              <CircularProgress />
+            </Stack>
+          )}
+          {detailsError && (
+            <Typography color="error" sx={{ textAlign: 'center' }}>
+              {detailsError}
+            </Typography>
+          )}
+          {selectedMovie && (
+            <>
+              <Typography variant="h6" gutterBottom>{selectedMovie.title}</Typography>
+              <Typography gutterBottom><strong>Year:</strong> {selectedMovie.year || 'N/A'}</Typography>
+              <Typography gutterBottom><strong>Director:</strong> {selectedMovie.director || 'N/A'}</Typography>
+              <Typography gutterBottom><strong>Description:</strong> {selectedMovie.description || 'No description available.'}</Typography>
+              {/* Add more fields if your data has them */}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDetailsModal}>Close</Button>
         </DialogActions>
       </Dialog>
     </Container>
