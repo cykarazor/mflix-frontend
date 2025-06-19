@@ -14,15 +14,17 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  InputAdornment,
   IconButton,
+  Box,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
+
+// Pagination icons
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import ClearIcon from '@mui/icons-material/Clear';  // <-- added clear icon
 
 import EditMovieForm from './EditMovieForm'; // Your form component
 
@@ -40,11 +42,11 @@ function App() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('title');
+
   const [editMovieId, setEditMovieId] = useState(null);
 
-  const [selectedMovie, setSelectedMovie] = useState(null);
-  const [detailsLoading, setDetailsLoading] = useState(false);
-  const [detailsError, setDetailsError] = useState(null);
+  // For movie details modal
+  const [detailsMovie, setDetailsMovie] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -73,40 +75,18 @@ function App() {
       });
   }, [page, sort, search]);
 
-  const openDetailsModal = async (movieId) => {
-    setDetailsLoading(true);
-    setDetailsError(null);
-    setSelectedMovie(null);
+  const handleCloseEditModal = () => setEditMovieId(null);
+  const handleMovieUpdated = () => setPage(1);
 
-    try {
-      const res = await fetch(`https://mflix-backend-ysnw.onrender.com/api/movies/${movieId}`);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
-      setSelectedMovie(data);
-    } catch (error) {
-      setDetailsError('Failed to load movie details');
-    } finally {
-      setDetailsLoading(false);
-    }
-  };
+  // Open movie details modal by setting the full movie object
+  const openDetailsModal = (movie) => setDetailsMovie(movie);
+  const closeDetailsModal = () => setDetailsMovie(null);
 
-  const handleCloseDetailsModal = () => {
-    setSelectedMovie(null);
-    setDetailsError(null);
-  };
-
-  const handleCloseEditModal = () => {
-    setEditMovieId(null);
-  };
-
-  const handleMovieUpdated = () => {
-    setPage(1);
-  };
-
-  // Clear search handler
-  const handleClearSearch = () => {
-    setSearch('');
-    setPage(1);
+  // Helper to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const d = new Date(dateString);
+    return d.toLocaleDateString();
   };
 
   return (
@@ -130,22 +110,6 @@ function App() {
           }}
           fullWidth
           sx={{ maxWidth: 400 }}
-          InputProps={{
-            endAdornment: (
-              search && (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="clear search"
-                    onClick={handleClearSearch}
-                    edge="end"
-                    size="small"
-                  >
-                    <ClearIcon />
-                  </IconButton>
-                </InputAdornment>
-              )
-            ),
-          }}
         />
 
         <TextField
@@ -188,25 +152,28 @@ function App() {
             <ListItem
               key={movie._id}
               divider
+              // Add striped background for even rows
+              sx={{ 
+                px: 3, 
+                bgcolor: index % 2 === 0 ? 'grey.100' : 'background.paper', 
+                cursor: 'pointer' 
+              }}
+              // Open details modal when clicking anywhere on the list item except the Edit button
+              onClick={(e) => {
+                // Prevent opening modal when clicking edit button
+                if (e.target.closest('button')) return;
+                openDetailsModal(movie);
+              }}
               secondaryAction={
                 <Button
                   variant="outlined"
-                  startIcon={<EditIcon sx={{ mr: 0.5 }} />}
-                  onClick={(e) => {
-                    e.stopPropagation(); // prevent opening details modal
-                    setEditMovieId(movie._id);
-                  }}
+                  startIcon={<EditIcon />}
+                  onClick={() => setEditMovieId(movie._id)}
                   sx={{ textTransform: 'none' }}
                 >
                   Edit
                 </Button>
               }
-              sx={{
-                px: 3,
-                bgcolor: index % 2 === 0 ? 'action.hover' : 'background.default',
-                cursor: 'pointer',
-              }}
-              onClick={() => openDetailsModal(movie._id)}
             >
               <ListItemText
                 primary={<Typography sx={{ fontWeight: 'medium' }}>{movie.title}</Typography>}
@@ -282,36 +249,48 @@ function App() {
       </Dialog>
 
       {/* Movie Details Modal */}
-      <Dialog
-        open={!!selectedMovie || detailsLoading || !!detailsError}
-        onClose={handleCloseDetailsModal}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Movie Details</DialogTitle>
+      <Dialog open={!!detailsMovie} onClose={closeDetailsModal} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          {detailsMovie?.title}
+          <IconButton
+            aria-label="close"
+            onClick={closeDetailsModal}
+            sx={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
         <DialogContent dividers>
-          {detailsLoading && (
-            <Stack alignItems="center" sx={{ my: 4 }}>
-              <CircularProgress />
-            </Stack>
-          )}
-          {detailsError && (
-            <Typography color="error" sx={{ textAlign: 'center' }}>
-              {detailsError}
-            </Typography>
-          )}
-          {selectedMovie && (
-            <>
-              <Typography variant="h6" gutterBottom>{selectedMovie.title}</Typography>
-              <Typography gutterBottom><strong>Year:</strong> {selectedMovie.year || 'N/A'}</Typography>
-              <Typography gutterBottom><strong>Director:</strong> {selectedMovie.director || 'N/A'}</Typography>
-              <Typography gutterBottom><strong>Description:</strong> {selectedMovie.description || 'No description available.'}</Typography>
-              {/* Add more fields if your data has them */}
-            </>
+          {detailsMovie && (
+            <Box>
+              {detailsMovie.poster && (
+                <Box
+                  component="img"
+                  src={detailsMovie.poster}
+                  alt={detailsMovie.title}
+                  sx={{ width: '100%', borderRadius: 1, mb: 2 }}
+                />
+              )}
+              <Typography variant="body1" gutterBottom><strong>Year:</strong> {detailsMovie.year || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Rated:</strong> {detailsMovie.rated || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Runtime:</strong> {detailsMovie.runtime ? `${detailsMovie.runtime} minutes` : 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Genres:</strong> {detailsMovie.genres?.join(', ') || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Plot:</strong> {detailsMovie.plot || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Full Plot:</strong> {detailsMovie.fullplot || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Cast:</strong> {detailsMovie.cast?.join(', ') || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Directors:</strong> {detailsMovie.directors?.join(', ') || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Languages:</strong> {detailsMovie.languages?.join(', ') || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Countries:</strong> {detailsMovie.countries?.join(', ') || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Released:</strong> {formatDate(detailsMovie.released?.$date || detailsMovie.released) || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>IMDb Rating:</strong> {detailsMovie.imdb?.rating || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>IMDb Votes:</strong> {detailsMovie.imdb?.votes || 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Tomato Meter:</strong> {detailsMovie.tomatoes?.viewer?.meter ? `${detailsMovie.tomatoes.viewer.meter}%` : 'N/A'}</Typography>
+              <Typography variant="body1" gutterBottom><strong>Awards:</strong> {detailsMovie.awards?.text || 'N/A'}</Typography>
+            </Box>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDetailsModal}>Close</Button>
+          <Button onClick={closeDetailsModal}>Close</Button>
         </DialogActions>
       </Dialog>
     </Container>
