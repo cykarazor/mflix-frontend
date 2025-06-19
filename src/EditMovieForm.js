@@ -6,7 +6,11 @@ import {
   Stack,
   CircularProgress,
   Alert,
+  IconButton,
+  Box,
+  Typography,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 function EditMovieForm({ movieId, onClose, onUpdated }) {
   const [title, setTitle] = useState('');
@@ -16,7 +20,6 @@ function EditMovieForm({ movieId, onClose, onUpdated }) {
   const [error, setError] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
 
-  // Fetch movie details when movieId changes
   useEffect(() => {
     if (!movieId) return;
     setLoading(true);
@@ -45,7 +48,6 @@ function EditMovieForm({ movieId, onClose, onUpdated }) {
     setError(null);
     setSuccessMsg(null);
 
-    // Validate inputs
     if (!title.trim()) {
       setError('Title is required');
       setSaving(false);
@@ -84,43 +86,59 @@ function EditMovieForm({ movieId, onClose, onUpdated }) {
   if (loading) return <CircularProgress />;
 
   return (
-    <form onSubmit={handleSubmit}>
-      <Stack spacing={2}>
-        {error && <Alert severity="error">{error}</Alert>}
-        {successMsg && <Alert severity="success">{successMsg}</Alert>}
+    <Box sx={{ position: 'relative' }}>
+      {/* Top bar with X icon */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+        }}
+      >
+        <IconButton onClick={onClose} size="small">
+          <CloseIcon />
+        </IconButton>
+      </Box>
 
-        <TextField
-          label="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          fullWidth
-          required
-          autoFocus
-        />
+      <Typography variant="h6" sx={{ mb: 2 }}>
+        Edit Movie
+      </Typography>
 
-        <TextField
-          label="Year"
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          fullWidth
-          inputProps={{ maxLength: 4 }}
-          placeholder="e.g. 2022"
-        />
+      <form onSubmit={handleSubmit}>
+        <Stack spacing={2}>
+          {error && <Alert severity="error">{error}</Alert>}
+          {successMsg && <Alert severity="success">{successMsg}</Alert>}
 
-        <Stack direction="row" spacing={2} justifyContent="flex-end">
-          <Button onClick={onClose} disabled={saving}>
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={saving}
-          >
-            {saving ? <CircularProgress size={24} /> : 'Save'}
-          </Button>
+          <TextField
+            label="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            fullWidth
+            required
+            autoFocus
+          />
+
+          <TextField
+            label="Year"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            fullWidth
+            inputProps={{ maxLength: 4 }}
+            placeholder="e.g. 2022"
+          />
+
+          <Stack direction="row" spacing={2} justifyContent="flex-end">
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={saving}
+            >
+              {saving ? <CircularProgress size={24} /> : 'Save'}
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
-    </form>
+      </form>
+    </Box>
   );
 }
 
