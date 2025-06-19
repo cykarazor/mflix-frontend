@@ -16,6 +16,13 @@ import {
   DialogActions,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+
+// Added pagination icons
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import LastPageIcon from '@mui/icons-material/LastPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+
 import EditMovieForm from './EditMovieForm'; // Your form component
 
 const PAGE_SIZE = 10;
@@ -160,6 +167,7 @@ function App() {
             onClick={() => setPage(1)}
             disabled={page === 1}
             sx={{ minWidth: 80 }}
+            startIcon={<FirstPageIcon />}
           >
             First
           </Button>
@@ -168,6 +176,7 @@ function App() {
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}
             sx={{ minWidth: 80 }}
+            startIcon={<NavigateBeforeIcon />}
           >
             Prev
           </Button>
@@ -179,6 +188,7 @@ function App() {
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={page === totalPages}
             sx={{ minWidth: 80 }}
+            endIcon={<NavigateNextIcon />}
           >
             Next
           </Button>
@@ -187,6 +197,7 @@ function App() {
             onClick={() => setPage(totalPages)}
             disabled={page === totalPages}
             sx={{ minWidth: 80 }}
+            endIcon={<LastPageIcon />}
           >
             Last
           </Button>
