@@ -14,6 +14,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  InputAdornment,
+  IconButton,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 
@@ -22,6 +24,7 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import ClearIcon from '@mui/icons-material/Clear';  // <-- import clear icon
 
 import EditMovieForm from './EditMovieForm'; // Your form component
 
@@ -68,6 +71,11 @@ function App() {
       });
   }, [page, sort, search]);
 
+  const handleClearSearch = () => {
+    setSearch('');
+    setPage(1);
+  };
+
   const handleCloseEditModal = () => {
     setEditMovieId(null);
   };
@@ -97,6 +105,15 @@ function App() {
           }}
           fullWidth
           sx={{ maxWidth: 400 }}
+          InputProps={{
+            endAdornment: search && (
+              <InputAdornment position="end">
+                <IconButton onClick={handleClearSearch} edge="end" aria-label="clear search">
+                  <ClearIcon />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
 
         <TextField
@@ -116,6 +133,8 @@ function App() {
           ))}
         </TextField>
       </Stack>
+
+      {/* ... rest of your component unchanged ... */}
 
       {loading && (
         <Stack alignItems="center" sx={{ my: 4 }}>
