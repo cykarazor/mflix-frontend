@@ -24,7 +24,9 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import ClearIcon from '@mui/icons-material/Clear';  // <-- import clear icon
+
+// Clear search icon
+import ClearIcon from '@mui/icons-material/Clear';
 
 import EditMovieForm from './EditMovieForm'; // Your form component
 
@@ -71,16 +73,16 @@ function App() {
       });
   }, [page, sort, search]);
 
-  const handleClearSearch = () => {
-    setSearch('');
-    setPage(1);
-  };
-
   const handleCloseEditModal = () => {
     setEditMovieId(null);
   };
 
   const handleMovieUpdated = () => {
+    setPage(1);
+  };
+
+  const clearSearch = () => {
+    setSearch('');
     setPage(1);
   };
 
@@ -108,7 +110,12 @@ function App() {
           InputProps={{
             endAdornment: search && (
               <InputAdornment position="end">
-                <IconButton onClick={handleClearSearch} edge="end" aria-label="clear search">
+                <IconButton
+                  aria-label="clear search"
+                  onClick={clearSearch}
+                  edge="end"
+                  size="small"
+                >
                   <ClearIcon />
                 </IconButton>
               </InputAdornment>
@@ -134,8 +141,6 @@ function App() {
         </TextField>
       </Stack>
 
-      {/* ... rest of your component unchanged ... */}
-
       {loading && (
         <Stack alignItems="center" sx={{ my: 4 }}>
           <CircularProgress />
@@ -154,7 +159,7 @@ function App() {
 
       {!loading && !error && movies.length > 0 && (
         <List sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3 }}>
-          {movies.map((movie) => (
+          {movies.map((movie, index) => (
             <ListItem
               key={movie._id}
               divider
@@ -168,7 +173,10 @@ function App() {
                   Edit
                 </Button>
               }
-              sx={{ px: 3 }}
+              sx={{
+                px: 3,
+                bgcolor: index % 2 === 0 ? 'action.hover' : 'background.default',
+              }}
             >
               <ListItemText
                 primary={<Typography sx={{ fontWeight: 'medium' }}>{movie.title}</Typography>}
@@ -186,7 +194,7 @@ function App() {
             onClick={() => setPage(1)}
             disabled={page === 1}
             sx={{ minWidth: 80 }}
-            startIcon={<FirstPageIcon sx={{ mr: 0.5 }} />}
+            startIcon={<FirstPageIcon />}
           >
             First
           </Button>
@@ -195,7 +203,7 @@ function App() {
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}
             sx={{ minWidth: 80 }}
-            startIcon={<NavigateBeforeIcon sx={{ mr: 0.5 }} />}
+            startIcon={<NavigateBeforeIcon />}
           >
             Prev
           </Button>
@@ -207,7 +215,7 @@ function App() {
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={page === totalPages}
             sx={{ minWidth: 80 }}
-            startIcon={<NavigateNextIcon sx={{ mr: 0.5 }} />}
+            endIcon={<NavigateNextIcon />}
           >
             Next
           </Button>
@@ -216,7 +224,7 @@ function App() {
             onClick={() => setPage(totalPages)}
             disabled={page === totalPages}
             sx={{ minWidth: 80 }}
-            startIcon={<LastPageIcon sx={{ mr: 0.5 }} />}
+            endIcon={<LastPageIcon />}
           >
             Last
           </Button>
