@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
+import ClearIcon from '@mui/icons-material/Clear';  // <-- import this at the top
 
 // Pagination icons
 import FirstPageIcon from '@mui/icons-material/FirstPage';
@@ -100,11 +101,7 @@ function App() {
         spacing={2}
         sx={{ mb: 4, justifyContent: 'space-between' }}
       >
-        import ClearIcon from '@mui/icons-material/Clear';  // <-- import this at the top
-
-// ...
-
-<TextField
+       <TextField
   label="Search"
   variant="outlined"
   value={search}
@@ -129,8 +126,7 @@ function App() {
       </IconButton>
     ) : null,
   }}
-/>
-
+/> 
 
         <TextField
           select
