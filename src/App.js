@@ -305,9 +305,7 @@ function App() {
             </Box>
           )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDetailsModal}>Close</Button>
-        </DialogActions>
+        
       </Dialog>
     </Container>
   );
