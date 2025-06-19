@@ -188,7 +188,7 @@ function App() {
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={page === totalPages}
             sx={{ minWidth: 80 }}
-            endIcon={<NavigateNextIcon sx={{ ml: 0.5 }} />}
+            startIcon={<NavigateNextIcon sx={{ mr: 0.5 }} />}
           >
             Next
           </Button>
@@ -197,7 +197,7 @@ function App() {
             onClick={() => setPage(totalPages)}
             disabled={page === totalPages}
             sx={{ minWidth: 80 }}
-            endIcon={<LastPageIcon sx={{ ml: 0.5 }} />}
+            startIcon={<LastPageIcon sx={{ mr: 0.5 }} />}
           >
             Last
           </Button>
