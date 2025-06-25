@@ -3,18 +3,21 @@ import { TextField, Button, Stack, Typography } from '@mui/material';
 import axios from 'axios';
 
 // Use your environment variable or fallback URL
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://mflix-backend-ysnw.onrender.com';
+const API_BASE_URL =
+  process.env.REACT_APP_API_BASE_URL ||
+  'https://mflix-backend-ysnw.onrender.com';
 
 const RegisterForm = () => {
-  const [username, setUsername] = useState('');
+  const [name, setName]       = useState('');
+  const [email, setEmail]     = useState('');
   const [password, setPassword] = useState('');
-  const [msg, setMsg] = useState('');
+  const [msg, setMsg]         = useState('');
 
   const handleRegister = async () => {
     try {
       await axios.post(
         `${API_BASE_URL}/api/auth/register`,
-        { username, password }
+        { name, email, password }
       );
       setMsg('Registration successful! You can now log in.');
     } catch (err) {
@@ -24,24 +27,37 @@ const RegisterForm = () => {
 
   return (
     <Stack spacing={2} maxWidth={400} mx="auto" mt={5}>
-      <Typography variant="h5" align="center">Register</Typography>
+      <Typography variant="h5" align="center">
+        Register
+      </Typography>
       <TextField
-        label="Username"
-        value={username}
-        onChange={e => setUsername(e.target.value)}
+        label="Full Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        fullWidth
+      />
+      <TextField
+        label="Email"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
         fullWidth
       />
       <TextField
         label="Password"
         type="password"
         value={password}
-        onChange={e => setPassword(e.target.value)}
+        onChange={(e) => setPassword(e.target.value)}
         fullWidth
       />
       <Button variant="contained" onClick={handleRegister} fullWidth>
         Register
       </Button>
-      {msg && <Typography color="primary" align="center">{msg}</Typography>}
+      {msg && (
+        <Typography color="primary" align="center">
+          {msg}
+        </Typography>
+      )}
     </Stack>
   );
 };
