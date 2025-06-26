@@ -1,3 +1,16 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { UserContext } from './UserContext';
+
+const navigate = useNavigate();
+const { user } = useContext(UserContext);
+
+useEffect(() => {
+  if (user) navigate('/');
+}, [user, navigate]);
+
+
 import React, { useState } from 'react';
 import { TextField, Button, Stack, Typography } from '@mui/material';
 import axios from 'axios';
