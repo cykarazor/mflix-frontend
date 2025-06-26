@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Container, Typography, List, ListItem, ListItemText, Button, Stack,
   CircularProgress, TextField, MenuItem, Dialog, DialogTitle, DialogContent,
@@ -13,7 +13,7 @@ import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import EditMovieForm from './EditMovieForm';
 import axios from 'axios';
-import { useUser } from './UserContext';
+import { UserContext } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE = 10;
@@ -23,7 +23,7 @@ const sortOptions = [
 ];
 
 export default function MovieList() {
-  const { user } = useUser();
+  const { user } = useContext(UserContext);
   const navigate = useNavigate();
 
   const [movies, setMovies] = useState([]);
@@ -55,7 +55,7 @@ export default function MovieList() {
         });
 
         const res = await axios.get(
-          `https://mflix-backend-ysnw.onrender.com/api/movies?${params}`,
+          `https://mflix-backend-ysnw.onrender.com/api/movies?${params.toString()}`,
           {
             headers: { Authorization: `Bearer ${user.token}` },
           }

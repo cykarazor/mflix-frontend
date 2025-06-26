@@ -1,4 +1,3 @@
-// App.js
 import React, { useContext } from 'react';
 import {
   Container,
@@ -21,6 +20,15 @@ import { UserContext } from './UserContext';
 
 function App() {
   const { user, logout } = useContext(UserContext);
+
+  // ProtectedRoute component to wrap protected pages
+  const ProtectedRoute = ({ children }) => {
+    if (!user) {
+      // Redirect to login if not logged in
+      return <Navigate to="/login" replace />;
+    }
+    return children;
+  };
 
   return (
     <Router>
@@ -46,9 +54,16 @@ function App() {
         </Stack>
 
         <Routes>
-          <Route path="/" element={<MovieList />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/register" element={<RegisterForm />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <MovieList />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginForm />} />
+          <Route path="/register" element={user ? <Navigate to="/" replace /> : <RegisterForm />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Container>
