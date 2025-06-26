@@ -66,6 +66,7 @@ export default function MovieList() {
         setMovies(response.data.movies || []);
         setTotalPages(response.data.totalPages || 1);
       } catch (err) {
+        console.error('Fetch movies error:', err.response || err.message || err);
         setError('Failed to load movies');
       } finally {
         setLoading(false);
