@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { UserContext } from './UserContext';
+import axios from 'axios';
+import { TextField, Button, Box, Typography } from '@mui/material';
 
 const navigate = useNavigate();
 const { user } = useContext(UserContext);
@@ -9,12 +12,6 @@ const { user } = useContext(UserContext);
 useEffect(() => {
   if (user) navigate('/');
 }, [user, navigate]);
-
-import React, { useState, useContext } from 'react';
-import { TextField, Button, Box, Typography } from '@mui/material';
-import axios from 'axios';
-import { UserContext } from './UserContext';
-import { useNavigate } from 'react-router-dom';
 
 const API_BASE_URL =
   process.env.REACT_APP_API_BASE_URL || 'https://mflix-backend-ysnw.onrender.com';
