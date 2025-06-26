@@ -1,40 +1,40 @@
-import { useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { TextField, Button, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useContext } from 'react';
+import axios from 'axios';
 import { UserContext } from './UserContext';
 
-const navigate = useNavigate();
-const { user } = useContext(UserContext);
-
-useEffect(() => {
-  if (user) navigate('/');
-}, [user, navigate]);
-
-
-import React, { useState } from 'react';
-import { TextField, Button, Stack, Typography } from '@mui/material';
-import axios from 'axios';
-
-// Use your environment variable or fallback URL
 const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL ||
-  'https://mflix-backend-ysnw.onrender.com';
+  process.env.REACT_APP_API_BASE_URL || 'https://mflix-backend-ysnw.onrender.com';
 
 const RegisterForm = () => {
-  const [name, setName]       = useState('');
-  const [email, setEmail]     = useState('');
+  const navigate = useNavigate();
+  const { user } = useContext(UserContext);
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [msg, setMsg]         = useState('');
+  const [msg, setMsg] = useState('');
+
+  useEffect(() => {
+    if (user) navigate('/');
+  }, [user, navigate]);
 
   const handleRegister = async () => {
+    setMsg('');
     try {
-      await axios.post(
-        `${API_BASE_URL}/api/auth/register`,
-        { name, email, password }
-      );
-      setMsg('Registration successful! You can now log in.');
+      await axios.post(`${API_BASE_URL}/api/auth/register`, {
+        name,
+        email,
+        password,
+      });
+      setMsg('✅ Registration successful! Redirecting to login...');
+      setName('');
+      setEmail('');
+      setPassword('');
+      setTimeout(() => navigate('/login'), 1500);
     } catch (err) {
-      setMsg(err.response?.data?.error || 'Registration failed');
+      setMsg(err.response?.data?.error || '❌ Registration failed.');
     }
   };
 
@@ -48,6 +48,7 @@ const RegisterForm = () => {
         value={name}
         onChange={(e) => setName(e.target.value)}
         fullWidth
+        required
       />
       <TextField
         label="Email"
@@ -55,6 +56,7 @@ const RegisterForm = () => {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         fullWidth
+        required
       />
       <TextField
         label="Password"
@@ -62,12 +64,13 @@ const RegisterForm = () => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         fullWidth
+        required
       />
       <Button variant="contained" onClick={handleRegister} fullWidth>
         Register
       </Button>
       {msg && (
-        <Typography color="primary" align="center">
+        <Typography color={msg.includes('success') ? 'primary' : 'error'} align="center">
           {msg}
         </Typography>
       )}
