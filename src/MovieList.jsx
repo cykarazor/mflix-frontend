@@ -27,6 +27,7 @@ import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
+import axios from 'axios';
 import EditMovieForm from './EditMovieForm'; // Your form component
 
 const PAGE_SIZE = 10;
@@ -50,30 +51,28 @@ export default function MovieList() {
   const [detailsMovie, setDetailsMovie] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    const fetchMovies = async () => {
+      setLoading(true);
+      setError(null);
 
-    const params = new URLSearchParams({
-      page,
-      limit: PAGE_SIZE,
-      sortBy: sort,
-      search,
-    });
+      try {
+        const token = localStorage.getItem('token');
 
-    fetch(`https://mflix-backend-ysnw.onrender.com/api/movies?${params.toString()}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        setMovies(data.movies || []);
-        setTotalPages(data.totalPages || 1);
-        setLoading(false);
-      })
-      .catch(() => {
+        const response = await axios.get('https://mflix-backend-ysnw.onrender.com/api/movies', {
+          params: { page, limit: PAGE_SIZE, sortBy: sort, search },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+
+        setMovies(response.data.movies || []);
+        setTotalPages(response.data.totalPages || 1);
+      } catch (err) {
         setError('Failed to load movies');
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchMovies();
   }, [page, sort, search]);
 
   const handleCloseEditModal = () => setEditMovieId(null);
