@@ -1,9 +1,11 @@
 // src/UserContext.jsx
 
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
+// Create the context
 export const UserContext = createContext();
 
+// Provider component
 export function UserProvider({ children }) {
   const [user, setUser] = useState(
     () => JSON.parse(localStorage.getItem('user')) || null
@@ -26,4 +28,9 @@ export function UserProvider({ children }) {
       {children}
     </UserContext.Provider>
   );
+}
+
+// Custom hook to access user context
+export function useUser() {
+  return useContext(UserContext);
 }
