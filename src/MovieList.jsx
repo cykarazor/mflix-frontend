@@ -1,34 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Button,
-  Stack,
-  CircularProgress,
-  TextField,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  Box,
+  Container, Typography, List, ListItem, ListItemText, Button, Stack,
+  CircularProgress, TextField, MenuItem, Dialog, DialogTitle, DialogContent,
+  DialogActions, IconButton, Box
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import ClearIcon from '@mui/icons-material/Clear';
-
-// Pagination icons
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-
+import EditMovieForm from './EditMovieForm';
 import axios from 'axios';
-import EditMovieForm from './EditMovieForm'; // Your form component
+import { useUser } from './UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE = 10;
 const sortOptions = [
@@ -37,6 +23,9 @@ const sortOptions = [
 ];
 
 export default function MovieList() {
+  const { user } = useUser();
+  const navigate = useNavigate();
+
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -44,29 +33,37 @@ export default function MovieList() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('title');
-
   const [editMovieId, setEditMovieId] = useState(null);
-
-  // For movie details modal
   const [detailsMovie, setDetailsMovie] = useState(null);
 
   useEffect(() => {
+    if (!user?.token) {
+      navigate('/login');
+      return;
+    }
+
     const fetchMovies = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const token = localStorage.getItem('token');
-
-        const response = await axios.get('https://mflix-backend-ysnw.onrender.com/api/movies', {
-          params: { page, limit: PAGE_SIZE, sortBy: sort, search },
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        const params = new URLSearchParams({
+          page,
+          limit: PAGE_SIZE,
+          sortBy: sort,
+          search,
         });
 
-        setMovies(response.data.movies || []);
-        setTotalPages(response.data.totalPages || 1);
+        const res = await axios.get(
+          `https://mflix-backend-ysnw.onrender.com/api/movies?${params}`,
+          {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }
+        );
+
+        setMovies(res.data.movies || []);
+        setTotalPages(res.data.totalPages || 1);
       } catch (err) {
-        console.error('Fetch movies error:', err.response || err.message || err);
         setError('Failed to load movies');
       } finally {
         setLoading(false);
@@ -74,21 +71,25 @@ export default function MovieList() {
     };
 
     fetchMovies();
-  }, [page, sort, search]);
+  }, [page, sort, search, user, navigate]);
 
   const handleCloseEditModal = () => setEditMovieId(null);
   const handleMovieUpdated = () => setPage(1);
-
-  // Open movie details modal by setting the full movie object
   const openDetailsModal = (movie) => setDetailsMovie(movie);
   const closeDetailsModal = () => setDetailsMovie(null);
-
-  // Helper to format date
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const d = new Date(dateString);
     return d.toLocaleDateString();
   };
+
+  if (!user) {
+    return (
+      <Stack alignItems="center" sx={{ mt: 10 }}>
+        <CircularProgress />
+      </Stack>
+    );
+  }
 
   return (
     <Container maxWidth="md" sx={{ mt: 5, mb: 6 }}>
@@ -96,11 +97,7 @@ export default function MovieList() {
         Mflix Movies
       </Typography>
 
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        spacing={2}
-        sx={{ mb: 4, justifyContent: 'space-between' }}
-      >
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4, justifyContent: 'space-between' }}>
         <TextField
           label="Search"
           variant="outlined"
@@ -199,49 +196,15 @@ export default function MovieList() {
 
       {totalPages > 1 && (
         <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 4 }}>
-          <Button
-            variant="outlined"
-            onClick={() => setPage(1)}
-            disabled={page === 1}
-            sx={{ minWidth: 80 }}
-            startIcon={<FirstPageIcon />}
-          >
-            First
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            disabled={page === 1}
-            sx={{ minWidth: 80 }}
-            startIcon={<NavigateBeforeIcon />}
-          >
-            Prev
-          </Button>
-          <Typography variant="body1" sx={{ alignSelf: 'center' }}>
-            Page {page} of {totalPages}
-          </Typography>
-          <Button
-            variant="outlined"
-            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={page === totalPages}
-            sx={{ minWidth: 80 }}
-            endIcon={<NavigateNextIcon />}
-          >
-            Next
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={() => setPage(totalPages)}
-            disabled={page === totalPages}
-            sx={{ minWidth: 80 }}
-            endIcon={<LastPageIcon />}
-          >
-            Last
-          </Button>
+          <Button variant="outlined" onClick={() => setPage(1)} disabled={page === 1} startIcon={<FirstPageIcon />}>First</Button>
+          <Button variant="outlined" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page === 1} startIcon={<NavigateBeforeIcon />}>Prev</Button>
+          <Typography variant="body1" sx={{ alignSelf: 'center' }}>Page {page} of {totalPages}</Typography>
+          <Button variant="outlined" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page === totalPages} endIcon={<NavigateNextIcon />}>Next</Button>
+          <Button variant="outlined" onClick={() => setPage(totalPages)} disabled={page === totalPages} endIcon={<LastPageIcon />}>Last</Button>
         </Stack>
       )}
 
-      {/* Edit Movie Modal */}
+      {/* Edit Modal */}
       <Dialog open={!!editMovieId} onClose={handleCloseEditModal} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Movie Details</DialogTitle>
         <DialogContent dividers>
@@ -261,7 +224,7 @@ export default function MovieList() {
         </DialogActions>
       </Dialog>
 
-      {/* Movie Details Modal */}
+      {/* Details Modal */}
       <Dialog open={!!detailsMovie} onClose={closeDetailsModal} maxWidth="sm" fullWidth>
         <DialogTitle>
           {detailsMovie?.title}
@@ -277,19 +240,13 @@ export default function MovieList() {
           {detailsMovie && (
             <Box>
               {detailsMovie.poster && (
-                <Box
-                  component="img"
-                  src={detailsMovie.poster}
-                  alt={detailsMovie.title}
-                  sx={{ width: '100%', borderRadius: 1, mb: 2 }}
-                />
+                <Box component="img" src={detailsMovie.poster} alt={detailsMovie.title} sx={{ width: '100%', borderRadius: 1, mb: 2 }} />
               )}
               <Typography variant="body1" gutterBottom><strong>Year:</strong> {detailsMovie.year || 'N/A'}</Typography>
               <Typography variant="body1" gutterBottom><strong>Rated:</strong> {detailsMovie.rated || 'N/A'}</Typography>
               <Typography variant="body1" gutterBottom><strong>Runtime:</strong> {detailsMovie.runtime ? `${detailsMovie.runtime} minutes` : 'N/A'}</Typography>
               <Typography variant="body1" gutterBottom><strong>Genres:</strong> {detailsMovie.genres?.join(', ') || 'N/A'}</Typography>
               <Typography variant="body1" gutterBottom><strong>Plot:</strong> {detailsMovie.plot || 'N/A'}</Typography>
-              <Typography variant="body1" gutterBottom><strong>Full Plot:</strong> {detailsMovie.fullplot || 'N/A'}</Typography>
               <Typography variant="body1" gutterBottom><strong>Cast:</strong> {detailsMovie.cast?.join(', ') || 'N/A'}</Typography>
               <Typography variant="body1" gutterBottom><strong>Directors:</strong> {detailsMovie.directors?.join(', ') || 'N/A'}</Typography>
               <Typography variant="body1" gutterBottom><strong>Languages:</strong> {detailsMovie.languages?.join(', ') || 'N/A'}</Typography>
