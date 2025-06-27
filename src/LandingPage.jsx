@@ -9,35 +9,65 @@ export default function LandingPage() {
     <Box
       sx={{
         minHeight: '100vh',
+        position: 'relative',
         backgroundImage: 'url(https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1950&q=80)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         px: 2,
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          bgcolor: 'rgba(0, 0, 0, 0.5)',
+          zIndex: 1,
+        },
+        position: 'relative',
+        color: 'white',
       }}
+      aria-label="Landing page hero section with welcome message and navigation buttons"
     >
       <motion.div
-        initial={{ opacity: 0, y: -50 }}
+        initial={{ opacity: 0, y: -40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
+        style={{ position: 'relative', zIndex: 2, width: '100%' }}
       >
-        <Container maxWidth="md" sx={{ textAlign: 'center', backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 4, p: 5 }}>
-          <Typography variant="h2" fontWeight="bold" color="white" gutterBottom>
+        <Container maxWidth="sm" sx={{ textAlign: 'center', p: 5 }}>
+          <Typography
+            variant="h2"
+            component="h1"
+            fontWeight="bold"
+            gutterBottom
+            sx={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}
+          >
             Welcome to Mflix 🎬
           </Typography>
-          <Typography variant="h6" color="white" gutterBottom>
+          <Typography
+            variant="h6"
+            component="p"
+            gutterBottom
+            sx={{ textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}
+          >
             Discover and manage your favorite movies in one place.
           </Typography>
 
-          <Stack direction="row" spacing={2} justifyContent="center" mt={4}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={2}
+            justifyContent="center"
+            mt={4}
+          >
             <Button
               component={Link}
               to="/login"
               variant="contained"
               size="large"
-              sx={{ fontWeight: 'bold' }}
+              sx={{ fontWeight: 'bold', px: 5 }}
+              aria-label="Go to login page"
             >
               Login
             </Button>
@@ -46,7 +76,18 @@ export default function LandingPage() {
               to="/register"
               variant="outlined"
               size="large"
-              sx={{ color: 'white', borderColor: 'white', fontWeight: 'bold' }}
+              sx={{
+                color: 'white',
+                borderColor: 'white',
+                fontWeight: 'bold',
+                px: 5,
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  color: 'primary.main',
+                  bgcolor: 'transparent',
+                },
+              }}
+              aria-label="Go to register page"
             >
               Register
             </Button>
