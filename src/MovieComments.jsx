@@ -12,7 +12,7 @@ export default function MovieComments({ movieId }) {
     const fetchComments = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`https://mflix-backend-ysnw.onrender.com/api/comments/${movieId}`);
+        const res = await axios.get(`https://mflix-backend-ysnw.onrender.com/api/comments?movie_id=${movieId}`);
         setComments(res.data || []);
       } catch (err) {
         setError('Failed to load comments');

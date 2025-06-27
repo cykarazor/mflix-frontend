@@ -331,7 +331,7 @@ export default function MovieList() {
               {/* ✅ Added MovieComments component here to show comments for the selected movie */}
               <Box sx={{ mt: 4 }}>
                 <Typography variant="h6" gutterBottom>Comments</Typography>
-                <MovieComments movieId={detailsMovie._id} />
+                <MovieComments movieId={detailsMovie._id} token={user.token} />
               </Box>
             </Box>
           )}
