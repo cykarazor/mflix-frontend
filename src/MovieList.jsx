@@ -14,6 +14,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import EditMovieForm from './EditMovieForm';
+import MovieComments from './MovieComments'; // ✅ Added import for comments component
 import axios from 'axios';
 import { UserContext } from './UserContext';
 import { useNavigate } from 'react-router-dom';
@@ -294,7 +295,7 @@ export default function MovieList() {
         </DialogActions>
       </Dialog>
 
-      {/* Movie Details Modal (with Edit button) */}
+      {/* Movie Details Modal (with Edit button and Comments) */}
       <Dialog open={!!detailsMovie} onClose={closeDetailsModal} maxWidth="sm" fullWidth>
         <DialogTitle>
           {detailsMovie?.title}
@@ -326,13 +327,17 @@ export default function MovieList() {
               <Typography variant="body1" gutterBottom><strong>IMDb Votes:</strong> {detailsMovie.imdb?.votes || 'N/A'}</Typography>
               <Typography variant="body1" gutterBottom><strong>Tomato Meter:</strong> {detailsMovie.tomatoes?.viewer?.meter ? `${detailsMovie.tomatoes.viewer.meter}%` : 'N/A'}</Typography>
               <Typography variant="body1" gutterBottom><strong>Awards:</strong> {detailsMovie.awards?.text || 'N/A'}</Typography>
+
+              {/* ✅ Added MovieComments component here to show comments for the selected movie */}
+              <Box sx={{ mt: 4 }}>
+                <Typography variant="h6" gutterBottom>Comments</Typography>
+                <MovieComments movieId={detailsMovie._id} />
+              </Box>
             </Box>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDetailsModal}>Close</Button>
-
-          {/* ✅ Edit button moved here */}
           <Button
             variant="contained"
             startIcon={<EditIcon />}
