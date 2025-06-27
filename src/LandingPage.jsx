@@ -8,32 +8,39 @@ export default function LandingPage() {
   return (
     <Box
       sx={{
-        minHeight: '100vh',
         position: 'relative',
+        minHeight: '100vh',
+        backgroundImage: `url('https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1950&q=80')`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         px: 2,
-        background: `
-          linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
-          url(https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1950&q=80)
-        `,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
         color: 'white',
         zIndex: 0,
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          zIndex: 1,
+        },
       }}
     >
       <motion.div
         initial={{ opacity: 0, y: -40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
-        style={{ position: 'relative', zIndex: 1, width: '100%' }}
+        style={{ position: 'relative', zIndex: 2, width: '100%' }}
       >
         <Container maxWidth="sm" sx={{ textAlign: 'center', p: 5 }}>
           <Typography
             variant="h2"
-            component="h1"
             fontWeight="bold"
             gutterBottom
             sx={{ textShadow: '0 2px 8px rgba(0,0,0,0.7)' }}
@@ -42,7 +49,6 @@ export default function LandingPage() {
           </Typography>
           <Typography
             variant="h6"
-            component="p"
             gutterBottom
             sx={{ textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}
           >
