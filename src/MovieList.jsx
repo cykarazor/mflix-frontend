@@ -110,6 +110,7 @@ export default function MovieList() {
         Mflix Movies
       </Typography>
 
+      {/* Search + Sort */}
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4, justifyContent: 'space-between' }}>
         <TextField
           label="Search"
@@ -155,6 +156,7 @@ export default function MovieList() {
         </IconButton>
       </Stack>
 
+      {/* Loading/Error/Empty States */}
       {loading && (
         <Stack alignItems="center" sx={{ my: 4 }}>
           <CircularProgress />
@@ -171,6 +173,7 @@ export default function MovieList() {
         <Typography sx={{ textAlign: 'center' }}>No movies found.</Typography>
       )}
 
+      {/* Movie List */}
       {!loading && !error && movies.length > 0 && (
         <List sx={{ bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3 }}>
           {movies.map((movie, index) => (
@@ -182,22 +185,12 @@ export default function MovieList() {
                 bgcolor: index % 2 === 0 ? 'grey.100' : 'background.paper',
                 cursor: 'pointer',
                 alignItems: 'flex-start',
-                flexDirection: 'column', // Added to stack title + details vertically on small screens
+                flexDirection: 'column',
               }}
               onClick={(e) => {
                 if (e.target.closest('button')) return;
                 openDetailsModal(movie);
               }}
-              secondaryAction={
-                <Button
-                  variant="outlined"
-                  startIcon={<EditIcon />}
-                  onClick={() => setEditMovieId(movie._id)}
-                  sx={{ textTransform: 'none', ml: 2 }}
-                >
-                  Edit
-                </Button>
-              }
             >
               <Box sx={{ flex: 1 }}>
                 <Typography variant="subtitle1" sx={{ fontWeight: 'medium', wordBreak: 'break-word' }}>
@@ -210,12 +203,12 @@ export default function MovieList() {
                   {"\n"}Released: {formatDate(movie.released?.$date || movie.dateAdded || movie.released)}
                 </Typography>
               </Box>
-
             </ListItem>
           ))}
         </List>
       )}
 
+      {/* Pagination */}
       {totalPages > 1 && (
         <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 4 }}>
           <Button variant="outlined" onClick={() => setPage(1)} disabled={page === 1} startIcon={<FirstPageIcon />}>First</Button>
@@ -226,6 +219,7 @@ export default function MovieList() {
         </Stack>
       )}
 
+      {/* Edit Movie Modal */}
       <Dialog open={!!editMovieId} onClose={handleCloseEditModal} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Movie Details</DialogTitle>
         <DialogContent dividers>
@@ -245,6 +239,7 @@ export default function MovieList() {
         </DialogActions>
       </Dialog>
 
+      {/* Movie Details Modal (with Edit button) */}
       <Dialog open={!!detailsMovie} onClose={closeDetailsModal} maxWidth="sm" fullWidth>
         <DialogTitle>
           {detailsMovie?.title}
@@ -281,6 +276,18 @@ export default function MovieList() {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDetailsModal}>Close</Button>
+
+          {/* ✅ Edit button moved here */}
+          <Button
+            variant="contained"
+            startIcon={<EditIcon />}
+            onClick={() => {
+              setEditMovieId(detailsMovie._id);
+              closeDetailsModal();
+            }}
+          >
+            Edit
+          </Button>
         </DialogActions>
       </Dialog>
     </Container>
