@@ -229,17 +229,23 @@ export default function MovieList() {
                 </Button>
               }
             >
-              <ListItemText
-                primary={<Typography sx={{ fontWeight: 'medium' }}>{movie.title}</Typography>}
-                secondary={
-                  <>
-                    Year: {movie.year || 'N/A'} &nbsp; | &nbsp;
-                    Rating: {movie.imdb?.rating ?? movie.rating ?? 'N/A'} &nbsp; | &nbsp;
-                    Popularity: {movie.imdb?.votes ?? movie.views ?? 'N/A'} &nbsp; | &nbsp;
-                    Released: {formatDate(movie.released?.$date || movie.dateAdded || movie.released)}
-                  </>
-                }
-              />
+              <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+                <Typography
+                  sx={{
+                    fontWeight: 'medium',
+                    wordBreak: 'break-word',
+                    whiteSpace: 'normal',
+                  }}
+                >
+                  {movie.title}
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Year: {movie.year || 'N/A'} &nbsp; | &nbsp;
+                  Rating: {movie.imdb?.rating ?? movie.rating ?? 'N/A'} &nbsp; | &nbsp;
+                  Popularity: {movie.imdb?.votes ?? movie.views ?? 'N/A'} &nbsp; | &nbsp;
+                  Released: {formatDate(movie.released?.$date || movie.dateAdded || movie.released)}
+                </Typography>
+              </Box>
             </ListItem>
           ))}
         </List>
