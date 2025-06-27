@@ -216,7 +216,7 @@ export default function MovieList() {
           justifyContent="center"
           sx={{
             mt: 4,
-            flexWrap: 'wrap', // stack buttons on small screens
+            flexWrap: 'wrap',
             '& .MuiButton-root': {
               fontSize: { xs: '0.7rem', sm: '0.875rem' },
               px: { xs: 1, sm: 2 },
@@ -231,39 +231,47 @@ export default function MovieList() {
             disabled={page === 1}
             startIcon={<FirstPageIcon />}
           >
-            First
+            <Box display={{ xs: 'none', sm: 'inline' }}>First</Box>
           </Button>
+
           <Button
             variant="outlined"
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}
             startIcon={<NavigateBeforeIcon />}
           >
-            Prev
+            <Box display={{ xs: 'none', sm: 'inline' }}>Prev</Box>
           </Button>
+
           <Typography
             variant="body2"
-            sx={{ alignSelf: 'center', px: 1, fontSize: { xs: '0.75rem', sm: '1rem' } }}
+            sx={{
+              alignSelf: 'center',
+              px: 1,
+              fontSize: { xs: '0.75rem', sm: '1rem' },
+            }}
           >
             Page {page} of {totalPages}
           </Typography>
+
           <Button
             variant="outlined"
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={page === totalPages}
             endIcon={<NavigateNextIcon />}
           >
-            Next
+            <Box display={{ xs: 'none', sm: 'inline' }}>Next</Box>
           </Button>
+
           <Button
             variant="outlined"
             onClick={() => setPage(totalPages)}
             disabled={page === totalPages}
             endIcon={<LastPageIcon />}
           >
-            Last
+            <Box display={{ xs: 'none', sm: 'inline' }}>Last</Box>
           </Button>
-      </Stack>
+        </Stack>
       )}
 
       {/* Edit Movie Modal */}
