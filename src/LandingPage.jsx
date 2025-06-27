@@ -10,31 +10,25 @@ export default function LandingPage() {
       sx={{
         minHeight: '100vh',
         position: 'relative',
-        backgroundImage: 'url(https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1950&q=80)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         px: 2,
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          top: 0, left: 0, right: 0, bottom: 0,
-          bgcolor: 'rgba(0, 0, 0, 0.5)',
-          zIndex: 1,
-        },
-        position: 'relative',
+        background: `
+          linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+          url(https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1950&q=80)
+        `,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
         color: 'white',
+        zIndex: 0,
       }}
-      aria-label="Landing page hero section with welcome message and navigation buttons"
     >
       <motion.div
         initial={{ opacity: 0, y: -40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
-        style={{ position: 'relative', zIndex: 2, width: '100%' }}
+        style={{ position: 'relative', zIndex: 1, width: '100%' }}
       >
         <Container maxWidth="sm" sx={{ textAlign: 'center', p: 5 }}>
           <Typography
@@ -67,7 +61,6 @@ export default function LandingPage() {
               variant="contained"
               size="large"
               sx={{ fontWeight: 'bold', px: 5 }}
-              aria-label="Go to login page"
             >
               Login
             </Button>
@@ -87,7 +80,6 @@ export default function LandingPage() {
                   bgcolor: 'transparent',
                 },
               }}
-              aria-label="Go to register page"
             >
               Register
             </Button>
