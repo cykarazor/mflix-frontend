@@ -199,23 +199,18 @@ export default function MovieList() {
                 </Button>
               }
             >
-              <Typography
-                sx={{
-                  fontWeight: 'medium',
-                  wordWrap: 'break-word',
-                  overflowWrap: 'break-word',
-                  whiteSpace: 'normal',
-                  maxWidth: 'calc(100% - 80px)' // prevent text from overflowing past Edit button
-                }}
-              >
-                {movie.title}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Year: {movie.year || 'N/A'} &nbsp; | &nbsp;
-                Rating: {movie.imdb?.rating ?? movie.rating ?? 'N/A'} &nbsp; | &nbsp;
-                Popularity: {movie.imdb?.votes ?? movie.views ?? 'N/A'} &nbsp; | &nbsp;
-                Released: {formatDate(movie.released?.$date || movie.dateAdded || movie.released)}
-              </Typography>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 'medium', wordBreak: 'break-word' }}>
+                  {movie.title}
+                </Typography>
+
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', mt: 0.5 }}>
+                  Year: {movie.year || 'N/A'} | Rating: {movie.imdb?.rating ?? movie.rating ?? 'N/A'}
+                  {"\n"}Popularity: {movie.imdb?.votes ?? movie.views ?? 'N/A'}
+                  {"\n"}Released: {formatDate(movie.released?.$date || movie.dateAdded || movie.released)}
+                </Typography>
+              </Box>
+
             </ListItem>
           ))}
         </List>
