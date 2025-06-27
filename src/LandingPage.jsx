@@ -1,5 +1,6 @@
 // src/LandingPage.jsx
 import React from 'react';
+import bgImage from './assets/landing-bg.jpg'; // ✅ Local import
 import { Button, Container, Typography, Stack, Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -10,7 +11,7 @@ export default function LandingPage() {
       sx={{
         position: 'relative',
         minHeight: '100vh',
-        backgroundImage: `url('https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=1950&q=80')`,
+        backgroundImage: `url(${bgImage})`, // ✅ Use local file
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
