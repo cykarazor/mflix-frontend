@@ -8,23 +8,27 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    console.log('Loaded user from localStorage:', JSON.parse(storedUser));
+    setUser(JSON.parse(storedUser));
+  } else {
+    console.log('No user found in localStorage');
+  }
+}, []);
 
-  const login = (userData, token) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
-  };
+const login = (userData, token) => {
+  const userWithToken = { ...userData, token }; // embed token in user
+  localStorage.setItem('user', JSON.stringify(userWithToken));
+  setUser(userWithToken);
+};
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-  };
+const logout = () => {
+  console.log('Logging out and clearing storage');
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  setUser(null);
+};
 
   return (
     <UserContext.Provider value={{ user, login, logout }}>

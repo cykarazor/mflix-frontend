@@ -36,10 +36,10 @@ export default function MovieList() {
   const [editMovieId, setEditMovieId] = useState(null);
   const [detailsMovie, setDetailsMovie] = useState(null);
 
-  useEffect(() => {
-    if (!user?.token) {
-      navigate('/login');
-      return;
+ useEffect(() => {
+   if (!user?.token) {
+     navigate('/login');
+     return;
     }
 
     const fetchMovies = async () => {
