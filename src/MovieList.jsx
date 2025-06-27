@@ -210,13 +210,60 @@ export default function MovieList() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Stack direction="row" spacing={2} justifyContent="center" sx={{ mt: 4 }}>
-          <Button variant="outlined" onClick={() => setPage(1)} disabled={page === 1} startIcon={<FirstPageIcon />}>First</Button>
-          <Button variant="outlined" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page === 1} startIcon={<NavigateBeforeIcon />}>Prev</Button>
-          <Typography variant="body1" sx={{ alignSelf: 'center' }}>Page {page} of {totalPages}</Typography>
-          <Button variant="outlined" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page === totalPages} endIcon={<NavigateNextIcon />}>Next</Button>
-          <Button variant="outlined" onClick={() => setPage(totalPages)} disabled={page === totalPages} endIcon={<LastPageIcon />}>Last</Button>
-        </Stack>
+        <Stack
+          direction="row"
+          spacing={1}
+          justifyContent="center"
+          sx={{
+            mt: 4,
+            flexWrap: 'wrap', // stack buttons on small screens
+            '& .MuiButton-root': {
+              fontSize: { xs: '0.7rem', sm: '0.875rem' },
+              px: { xs: 1, sm: 2 },
+              py: { xs: 0.5, sm: 1 },
+              minWidth: { xs: 'auto', sm: '64px' },
+            },
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={() => setPage(1)}
+            disabled={page === 1}
+            startIcon={<FirstPageIcon />}
+          >
+            First
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            startIcon={<NavigateBeforeIcon />}
+          >
+            Prev
+          </Button>
+          <Typography
+            variant="body2"
+            sx={{ alignSelf: 'center', px: 1, fontSize: { xs: '0.75rem', sm: '1rem' } }}
+          >
+            Page {page} of {totalPages}
+          </Typography>
+          <Button
+            variant="outlined"
+            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={page === totalPages}
+            endIcon={<NavigateNextIcon />}
+          >
+            Next
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => setPage(totalPages)}
+            disabled={page === totalPages}
+            endIcon={<LastPageIcon />}
+          >
+            Last
+          </Button>
+      </Stack>
       )}
 
       {/* Edit Movie Modal */}
