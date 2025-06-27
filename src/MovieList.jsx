@@ -11,8 +11,8 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';         // NEW import for sort order icon
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';     // NEW import for sort order icon
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import EditMovieForm from './EditMovieForm';
 import axios from 'axios';
 import { UserContext } from './UserContext';
@@ -20,13 +20,12 @@ import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE = 10;
 
-// Expanded sort options list to include all desired fields
 const sortOptions = [
   { label: 'Title', value: 'title' },
   { label: 'Release Year', value: 'year' },
-  { label: 'IMDb Rating', value: 'rating' },       // NEW
-  { label: 'Popularity (Votes)', value: 'popularity' }, // NEW
-  { label: 'Date Added', value: 'dateAdded' },     // NEW
+  { label: 'IMDb Rating', value: 'rating' },
+  { label: 'Popularity (Votes)', value: 'popularity' },
+  { label: 'Date Added', value: 'dateAdded' },
 ];
 
 export default function MovieList() {
@@ -40,27 +39,18 @@ export default function MovieList() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('title');
-
-  const [ascending, setAscending] = useState(true);                      // NEW: ascending or descending order toggle
+  const [ascending, setAscending] = useState(true);
   const [editMovieId, setEditMovieId] = useState(null);
   const [detailsMovie, setDetailsMovie] = useState(null);
 
-  // NEW: Reset ascending default when sort changes, for user-friendly defaults
   useEffect(() => {
     switch (sort) {
-      case 'title':
-        setAscending(true);        // A → Z by default
-        break;
+      case 'title': setAscending(true); break;
       case 'year':
       case 'dateAdded':
-        setAscending(false);       // Newest → Oldest by default
-        break;
       case 'rating':
-      case 'popularity':
-        setAscending(false);       // High → Low by default
-        break;
-      default:
-        setAscending(true);
+      case 'popularity': setAscending(false); break;
+      default: setAscending(true);
     }
   }, [sort]);
 
@@ -69,29 +59,21 @@ export default function MovieList() {
       navigate('/login');
       return;
     }
-
     const fetchMovies = async () => {
       setLoading(true);
       setError(null);
-
       try {
-        // UPDATED: Added ascending/descending as query param
-        // Your backend API must support this or you can sort client-side after fetching all
         const params = new URLSearchParams({
           page,
           limit: PAGE_SIZE,
           sortBy: sort,
-          sortOrder: ascending ? 'asc' : 'desc',             // NEW param
+          sortOrder: ascending ? 'asc' : 'desc',
           search,
         });
-
         const res = await axios.get(
           `https://mflix-backend-ysnw.onrender.com/api/movies?${params.toString()}`,
-          {
-            headers: { Authorization: `Bearer ${user.token}` },
-          }
+          { headers: { Authorization: `Bearer ${user.token}` } }
         );
-
         setMovies(res.data.movies || []);
         setTotalPages(res.data.totalPages || 1);
       } catch (err) {
@@ -100,14 +82,14 @@ export default function MovieList() {
         setLoading(false);
       }
     };
-
     fetchMovies();
-  }, [page, sort, ascending, search, user, navigate]);   // UPDATED: added ascending as dependency
+  }, [page, sort, ascending, search, user, navigate]);
 
   const handleCloseEditModal = () => setEditMovieId(null);
   const handleMovieUpdated = () => setPage(1);
   const openDetailsModal = (movie) => setDetailsMovie(movie);
   const closeDetailsModal = () => setDetailsMovie(null);
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const d = new Date(dateString);
@@ -128,26 +110,19 @@ export default function MovieList() {
         Mflix Movies
       </Typography>
 
-      {/* UPDATED: Added ascending toggle button next to sort selector */}
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4, justifyContent: 'space-between' }}>
         <TextField
           label="Search"
           variant="outlined"
           value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setPage(1);
-          }}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           fullWidth
           sx={{ maxWidth: 400 }}
           InputProps={{
             endAdornment: search ? (
               <IconButton
                 aria-label="clear search"
-                onClick={() => {
-                  setSearch('');
-                  setPage(1);
-                }}
+                onClick={() => { setSearch(''); setPage(1); }}
                 edge="end"
                 size="small"
               >
@@ -161,10 +136,7 @@ export default function MovieList() {
           select
           label="Sort By"
           value={sort}
-          onChange={(e) => {
-            setSort(e.target.value);
-            setPage(1);
-          }}
+          onChange={(e) => { setSort(e.target.value); setPage(1); }}
           sx={{ width: 180 }}
         >
           {sortOptions.map((option) => (
@@ -174,12 +146,8 @@ export default function MovieList() {
           ))}
         </TextField>
 
-        {/* NEW: Ascending / Descending toggle button */}
         <IconButton
-          onClick={() => {
-            setAscending((prev) => !prev);
-            setPage(1);
-          }}
+          onClick={() => { setAscending((prev) => !prev); setPage(1); }}
           sx={{ alignSelf: 'center' }}
           aria-label={ascending ? 'Sort ascending' : 'Sort descending'}
         >
@@ -213,6 +181,8 @@ export default function MovieList() {
                 px: 3,
                 bgcolor: index % 2 === 0 ? 'grey.100' : 'background.paper',
                 cursor: 'pointer',
+                alignItems: 'flex-start',
+                flexDirection: 'column', // Added to stack title + details vertically on small screens
               }}
               onClick={(e) => {
                 if (e.target.closest('button')) return;
@@ -223,29 +193,29 @@ export default function MovieList() {
                   variant="outlined"
                   startIcon={<EditIcon />}
                   onClick={() => setEditMovieId(movie._id)}
-                  sx={{ textTransform: 'none' }}
+                  sx={{ textTransform: 'none', ml: 2 }}
                 >
                   Edit
                 </Button>
               }
             >
-              <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
-                <Typography
-                  sx={{
-                    fontWeight: 'medium',
-                    wordBreak: 'break-word',
-                    whiteSpace: 'normal',
-                  }}
-                >
-                  {movie.title}
-                </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Year: {movie.year || 'N/A'} &nbsp; | &nbsp;
-                  Rating: {movie.imdb?.rating ?? movie.rating ?? 'N/A'} &nbsp; | &nbsp;
-                  Popularity: {movie.imdb?.votes ?? movie.views ?? 'N/A'} &nbsp; | &nbsp;
-                  Released: {formatDate(movie.released?.$date || movie.dateAdded || movie.released)}
-                </Typography>
-              </Box>
+              <Typography
+                sx={{
+                  fontWeight: 'medium',
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word',
+                  whiteSpace: 'normal',
+                  maxWidth: 'calc(100% - 80px)' // prevent text from overflowing past Edit button
+                }}
+              >
+                {movie.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Year: {movie.year || 'N/A'} &nbsp; | &nbsp;
+                Rating: {movie.imdb?.rating ?? movie.rating ?? 'N/A'} &nbsp; | &nbsp;
+                Popularity: {movie.imdb?.votes ?? movie.views ?? 'N/A'} &nbsp; | &nbsp;
+                Released: {formatDate(movie.released?.$date || movie.dateAdded || movie.released)}
+              </Typography>
             </ListItem>
           ))}
         </List>
@@ -261,7 +231,6 @@ export default function MovieList() {
         </Stack>
       )}
 
-      {/* Edit Modal */}
       <Dialog open={!!editMovieId} onClose={handleCloseEditModal} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Movie Details</DialogTitle>
         <DialogContent dividers>
@@ -281,7 +250,6 @@ export default function MovieList() {
         </DialogActions>
       </Dialog>
 
-      {/* Details Modal */}
       <Dialog open={!!detailsMovie} onClose={closeDetailsModal} maxWidth="sm" fullWidth>
         <DialogTitle>
           {detailsMovie?.title}
