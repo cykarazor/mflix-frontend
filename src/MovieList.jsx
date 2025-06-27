@@ -11,15 +11,22 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';         // NEW import for sort order icon
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';     // NEW import for sort order icon
 import EditMovieForm from './EditMovieForm';
 import axios from 'axios';
 import { UserContext } from './UserContext';
 import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE = 10;
+
+// Expanded sort options list to include all desired fields
 const sortOptions = [
   { label: 'Title', value: 'title' },
-  { label: 'Year', value: 'year' },
+  { label: 'Release Year', value: 'year' },
+  { label: 'IMDb Rating', value: 'rating' },       // NEW
+  { label: 'Popularity (Votes)', value: 'popularity' }, // NEW
+  { label: 'Date Added', value: 'dateAdded' },     // NEW
 ];
 
 export default function MovieList() {
@@ -33,13 +40,34 @@ export default function MovieList() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('title');
+
+  const [ascending, setAscending] = useState(true);                      // NEW: ascending or descending order toggle
   const [editMovieId, setEditMovieId] = useState(null);
   const [detailsMovie, setDetailsMovie] = useState(null);
 
- useEffect(() => {
-   if (!user?.token) {
-     navigate('/login');
-     return;
+  // NEW: Reset ascending default when sort changes, for user-friendly defaults
+  useEffect(() => {
+    switch (sort) {
+      case 'title':
+        setAscending(true);        // A → Z by default
+        break;
+      case 'year':
+      case 'dateAdded':
+        setAscending(false);       // Newest → Oldest by default
+        break;
+      case 'rating':
+      case 'popularity':
+        setAscending(false);       // High → Low by default
+        break;
+      default:
+        setAscending(true);
+    }
+  }, [sort]);
+
+  useEffect(() => {
+    if (!user?.token) {
+      navigate('/login');
+      return;
     }
 
     const fetchMovies = async () => {
@@ -47,10 +75,13 @@ export default function MovieList() {
       setError(null);
 
       try {
+        // UPDATED: Added ascending/descending as query param
+        // Your backend API must support this or you can sort client-side after fetching all
         const params = new URLSearchParams({
           page,
           limit: PAGE_SIZE,
           sortBy: sort,
+          sortOrder: ascending ? 'asc' : 'desc',             // NEW param
           search,
         });
 
@@ -71,7 +102,7 @@ export default function MovieList() {
     };
 
     fetchMovies();
-  }, [page, sort, search, user, navigate]);
+  }, [page, sort, ascending, search, user, navigate]);   // UPDATED: added ascending as dependency
 
   const handleCloseEditModal = () => setEditMovieId(null);
   const handleMovieUpdated = () => setPage(1);
@@ -97,6 +128,7 @@ export default function MovieList() {
         Mflix Movies
       </Typography>
 
+      {/* UPDATED: Added ascending toggle button next to sort selector */}
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 4, justifyContent: 'space-between' }}>
         <TextField
           label="Search"
@@ -133,7 +165,7 @@ export default function MovieList() {
             setSort(e.target.value);
             setPage(1);
           }}
-          sx={{ width: 140 }}
+          sx={{ width: 180 }}
         >
           {sortOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
@@ -141,6 +173,18 @@ export default function MovieList() {
             </MenuItem>
           ))}
         </TextField>
+
+        {/* NEW: Ascending / Descending toggle button */}
+        <IconButton
+          onClick={() => {
+            setAscending((prev) => !prev);
+            setPage(1);
+          }}
+          sx={{ alignSelf: 'center' }}
+          aria-label={ascending ? 'Sort ascending' : 'Sort descending'}
+        >
+          {ascending ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+        </IconButton>
       </Stack>
 
       {loading && (
@@ -187,7 +231,14 @@ export default function MovieList() {
             >
               <ListItemText
                 primary={<Typography sx={{ fontWeight: 'medium' }}>{movie.title}</Typography>}
-                secondary={movie.year ? `Year: ${movie.year}` : null}
+                secondary={
+                  <>
+                    Year: {movie.year || 'N/A'} &nbsp; | &nbsp;
+                    Rating: {movie.imdb?.rating ?? movie.rating ?? 'N/A'} &nbsp; | &nbsp;
+                    Popularity: {movie.imdb?.votes ?? movie.views ?? 'N/A'} &nbsp; | &nbsp;
+                    Released: {formatDate(movie.released?.$date || movie.dateAdded || movie.released)}
+                  </>
+                }
               />
             </ListItem>
           ))}
