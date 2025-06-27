@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useContext } from 'react';
 import {
   Container,
@@ -6,7 +7,6 @@ import {
   Typography,
   AppBar,
   Toolbar,
-  Box,
 } from '@mui/material';
 import {
   BrowserRouter as Router,
@@ -16,37 +16,16 @@ import {
   Navigate,
 } from 'react-router-dom';
 
+import LandingPage from './LandingPage'; // ✅ Import styled LandingPage with background image
 import MovieList from './MovieList';
 import LoginForm from './LoginForm';
 import RegisterForm from './RegisterForm';
 import { UserContext } from './UserContext';
 
-// ✅ New Landing Page Component
-function LandingPage() {
-  return (
-    <Box textAlign="center" mt={10}>
-      <Typography variant="h3" gutterBottom>
-        🎬 Welcome to MFlix!
-      </Typography>
-      <Typography variant="h6" color="text.secondary" paragraph>
-        Browse and manage your movie collection with ease.
-      </Typography>
-      <Stack direction="row" spacing={2} justifyContent="center" mt={4}>
-        <Button variant="contained" component={Link} to="/login">
-          Login
-        </Button>
-        <Button variant="outlined" component={Link} to="/register">
-          Register
-        </Button>
-      </Stack>
-    </Box>
-  );
-}
-
 function App() {
   const { user, logout } = useContext(UserContext);
 
-  // ✅ ProtectedRoute wrapper for private pages
+  // ProtectedRoute wrapper to guard private routes
   const ProtectedRoute = ({ children }) => {
     if (!user) return <Navigate to="/login" replace />;
     return children;
@@ -54,12 +33,18 @@ function App() {
 
   return (
     <Router>
-      {/* ✅ AppBar added for a cleaner header */}
+      {/* AppBar with navigation links and user info */}
       <AppBar position="static">
         <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit' }}>
+          <Typography
+            variant="h6"
+            component={Link}
+            to="/"
+            sx={{ textDecoration: 'none', color: 'inherit' }}
+          >
             MFlix
           </Typography>
+
           <Stack direction="row" spacing={2}>
             {user ? (
               <>
@@ -87,12 +72,13 @@ function App() {
         </Toolbar>
       </AppBar>
 
+      {/* Main content container */}
       <Container maxWidth="md" sx={{ mt: 4 }}>
         <Routes>
-          {/* ✅ Landing page shows only if not logged in */}
+          {/* Use the imported LandingPage with background image if NOT logged in */}
           <Route path="/" element={!user ? <LandingPage /> : <Navigate to="/movies" />} />
 
-          {/* ✅ MovieList moved to /movies and protected */}
+          {/* Movies page protected behind login */}
           <Route
             path="/movies"
             element={
@@ -102,8 +88,11 @@ function App() {
             }
           />
 
+          {/* Login and Register routes redirect if already logged in */}
           <Route path="/login" element={user ? <Navigate to="/movies" replace /> : <LoginForm />} />
           <Route path="/register" element={user ? <Navigate to="/movies" replace /> : <RegisterForm />} />
+
+          {/* Redirect any unknown routes to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Container>
@@ -112,4 +101,3 @@ function App() {
 }
 
 export default App;
-// ✅ Added LandingPage component for a welcoming introduction
